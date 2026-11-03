@@ -23,31 +23,24 @@ class Meaning:
 
 
 if __name__ == "__main__":
-    # Test fetching inputted word from Dictionary API
+    # Fetch inputted word's raw dictionary data
     data = fetch_word("serendipity")
 
-    # Manually chain index the inputted word to get its first definition
-    first_def_dict = data[0]["meanings"][0]["definitions"][0]
+    # Instantiate a Meaning object
+    meaning = Meaning(data[0]["meanings"][0])
+    print(meaning.part_of_speech)
 
-    word_definition = Definition(first_def_dict)
+    # Loop through each Definition object stored inside the Meaning object
+    for definition in meaning.definitions:
+        print("  -", definition.text)
+        # Display example of inputted word if it has an example, else state none
+        if definition.example:
+            print("    Example(s):", definition.example)
+        else:
+            print("    Example(s): none")
 
-    # Explore data type of definition, and print the inputted word's definition, and example in a sentence and its synonyms (if there is any)
-    print(type(word_definition))
-    print("text:", word_definition.text)
-    print("example:", word_definition.example)
-    print("synonyms:", word_definition.synonyms)
-
-    # Test using a fake dictionary, with examples and synonyms
-    fake_word_definition = {
-        "definition": "To move quickly on foot.",
-        "example": "She runs every morning.",
-        "synonyms": ["jog", "sprint"],
-    }
-    word_definition_2 = Definition(fake_word_definition)
-    print("text:", word_definition_2.text)
-    print("example:", word_definition_2.example)
-    print("synonyms:", word_definition_2.synonyms)
-
-    # Test meaning model
-    m = Meaning(data[0]["meanings"][0])
-    print(m.part_of_speech, "-", m.definitions[0].text)
+        # Display synonyms of inputted word if it has a synonym, else state none
+        if definition.synonyms:
+            print("    Synonym(s):", ", ".join(definition.synonyms))
+        else:
+            print("    Example(s): none")
