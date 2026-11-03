@@ -22,25 +22,41 @@ class Meaning:
             self.definitions.append(Definition(definition_dict))
 
 
+class WordEntry:
+    """Stores the header (.word and phonetic), and the word's meanings."""
+
+    def __init__(self, data):
+        self.word = data["word"]
+        self.phonetic = data.get("phonetic", "")
+
+        self.meanings = [] 
+        for meaning_dict in data["meanings"]:
+            self.meanings.append(Meaning(meaning_dict)) 
+
+
 if __name__ == "__main__":
     # Fetch inputted word's raw dictionary data
     data = fetch_word("serendipity")
 
-    # Instantiate a Meaning object
-    meaning = Meaning(data[0]["meanings"][0])
-    print(meaning.part_of_speech)
+    # Build the word's entry header (.word and phonetcs)
+    entry = WordEntry(data[0])
+    print(entry.word, entry.phonetic)
 
-    # Loop through each Definition object stored inside the Meaning object
-    for definition in meaning.definitions:
-        print("  -", definition.text)
-        # Display example of inputted word if it has an example, else state none
-        if definition.example:
-            print("    Example(s):", definition.example)
-        else:
-            print("    Example(s): none")
+    # Loop through each Meaning, followed by each Definition
+    for meaning in entry.meanings: 
+        print(meaning.part_of_speech)
 
-        # Display synonyms of inputted word if it has a synonym, else state none
-        if definition.synonyms:
-            print("    Synonym(s):", ", ".join(definition.synonyms))
-        else:
-            print("    Synonym(s): none")
+        # Loop through each Definition object stored inside the Meaning object
+        for definition in meaning.definitions:
+            print("  -", definition.text)
+            # Display example of inputted word if it has an example, else state none
+            if definition.example:
+                print("    Example(s):", definition.example)
+            else:
+                print("    Example(s): none")
+
+            # Display synonyms of inputted word if it has a synonym, else state none
+            if definition.synonyms:
+                print("    Synonym(s):", ", ".join(definition.synonyms))
+            else:
+                print("    Synonym(s): none")
