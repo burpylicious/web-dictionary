@@ -14,7 +14,7 @@ class Meaning:
     """One part of speech of a word and all its definitions."""
 
     def __init__(self, data):
-        self.part_of_speech = data.get("partOfSpeech")
+        self.part_of_speech = data["partOfSpeech"]
 
         self.definitions = []
         # Loop over raw dictionary from API response
@@ -43,4 +43,4 @@ if __name__ == "__main__":
         if definition.synonyms:
             print("    Synonym(s):", ", ".join(definition.synonyms))
         else:
-            print("    Example(s): none")
+            print("    Synonym(s): none")
