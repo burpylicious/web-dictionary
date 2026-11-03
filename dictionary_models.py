@@ -4,10 +4,22 @@ class Definition:
     """One definition of the inputted word and its optional example and synonyms."""
 
     def __init__(self, data):
-        # Pull all the neede fields out of the definition dictionary
+        # Pull all the needed fields out of the definition dictionary
         self.text = data["definition"]
         self.example = data.get("example") # return none if no example can be retrieved from word
         self.synonyms = data.get("synonyms", []) # return an empty list if no synonyms can be retrieved from word
+
+
+class Meaning: 
+    """One part of speech of a word and all its definitions."""
+
+    def __init__(self, data):
+        self.part_of_speech = data.get("partOfSpeech")
+
+        self.definitions = []
+        # Loop over raw dictionary from API response
+        for definition_dict in data["definitions"]: 
+            self.definitions.append(Definition(definition_dict))
 
 
 if __name__ == "__main__":
@@ -35,3 +47,7 @@ if __name__ == "__main__":
     print("text:", word_definition_2.text)
     print("example:", word_definition_2.example)
     print("synonyms:", word_definition_2.synonyms)
+
+    # Test meaning model
+    m = Meaning(data[0]["meanings"][0])
+    print(m.part_of_speech, "-", m.definitions[0].text)
