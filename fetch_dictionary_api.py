@@ -2,24 +2,37 @@ import requests
 
 BASE_URL = "https://api.dictionaryapi.dev/api/v2/entries/en/"
 
+class DictionaryError(Exception):
+    """Base exception for all subsequent dictionary module errors."""
+
+
+class WordNotFoundError(DictionaryError):
+    """Error is raised when the word does not exist in Dictionary API data."""
+
+
+class DictionaryUnavailableError(DictionaryError):
+    """Raised when the API is down, offline, or returns invalid data."""
+
 
 def fetch_word(word):
-    """Return API's JSON response using user's inputted word, or None if not found."""
+    """Return API's JSON response using user's inputted word."""
     word = word.strip().lower()
 
     # Build url for inputted word
     url = f"{BASE_URL}{word}"
 
-    # Make request to Dictionary API and print error message if no data is retreived
+    # Make request to Dictionary API and raise DictionaryUnavailableError if connection could not be established
     try:
         response = requests.get(url, timeout=5)
     except requests.exceptions.RequestException:
-        print("Couldn't establish connection to Dictionary API, check your network.")
-        return None
+        raise DictionaryUnavailableError("Couldn't establish connection to Dictionary API, check your network.")
 
-    # If response is not valid (not response 200), then return None
+    # Raise WordNotFoundError if word is not found
+    if response.status_code == 404: 
+        raise WordNotFoundError(f"{url} is invalid, no defintions for \"{word}\" could be found")
+    # Raise DictionaryUnavailableError if response is not valid (not 200)
     if response.status_code != 200:
-        return None
+        raise DictionaryUnavailableError(f"Dictionary returned status {response.status_code}.")
 
     # Convert raw text data from Dictionary API into python data structure
     return response.json()
@@ -49,4 +62,7 @@ if __name__ == "__main__":
     print("DEFINITION:", first_def["definition"])
 
     # Test if word is not found in Dictionary API data
-    print("Word not found:", fetch_word("asdfghjk"))
+    try:
+        fetch_word("asdfghjk")
+    except DictionaryError as err:
+        print("Not found test:", type(err).__name__, "-", err)
