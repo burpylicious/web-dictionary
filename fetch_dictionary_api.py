@@ -1,4 +1,5 @@
 import string
+from urllib.parse import quote 
 import requests
 
 BASE_URL = "https://api.dictionaryapi.dev/api/v2/entries/en/"
@@ -35,9 +36,9 @@ def fetch_word(word):
     # Stop early if the input can't be a real word
     if not is_valid_word(word):
         raise InvalidWordError(f"'{word}' is not a valid word.")
-
-    # Build url for inputted word
-    url = f"{BASE_URL}{word}"
+    
+    # Build url for inputted word and ensure word is url safe using quote()
+    url = f"{BASE_URL}{quote(word)}"
 
     # Make request to Dictionary API and raise DictionaryUnavailableError if connection could not be established
     try:
@@ -53,7 +54,16 @@ def fetch_word(word):
         raise DictionaryUnavailableError(f"Dictionary returned status {response.status_code}.")
 
     # Convert raw text data from Dictionary API into python data structure
-    return response.json()
+    try:
+        data = response.json()
+    except ValueError:
+        raise DictionaryUnavailableError(f"Response from Dictionary API is not a valid JSON: {response.text[:100]}")
+
+    # Raise error if list is empty or response is not a list
+    if not isinstance(data, list) or not data:
+        raise DictionaryUnavailableError("Dictionary API sent an unexpected response.")
+
+    return data
 
 
 if __name__ == "__main__":
@@ -90,7 +100,7 @@ if __name__ == "__main__":
     for w in ["serendipity", "well-being", "don't", "ice cream", "", "123", "hell!o"]:
         print(f"is_valid_word({w!r}): ", is_valid_word(w))
 
-    for w in ["hello!", '"serendipity."', "Hell!o", "   ", "123"]:
+    for w in ["hello!", '"serendipity."', "Hell!o", "   ", "123", "ice cream"]:
         try:
             result = fetch_word(w)
             print(f"fetch_word({w!r}): {result[0]['word']} is a valid word")
