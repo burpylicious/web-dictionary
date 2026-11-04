@@ -1,12 +1,38 @@
 from fetch_dictionary_api import fetch_word
 
+def split_spaces(text):
+    """Squash runs of spaces into single spaces."""
+    return " ".join(text.split())
+
+
+def split_labels(text):
+    """Split text and returns (label, rest). label is "" when the text has no brackets or parentheses."""
+
+    if not text.startswith("("):
+        return "", text
+    close = text.find(")")
+    if close == -1:
+        return "", text
+    label = text[1:close]
+    rest = text[close+1:].strip()
+    return label, rest
+
 class Definition:
     """One definition of the inputted word and its optional example and synonyms."""
 
     def __init__(self, data):
-        # Pull all the needed fields out of the definition dictionary
-        self.text = data["definition"]
-        self.example = data.get("example") # return none if no example can be retrieved from word
+        """Pull all the needed fields out of the definition dictionary"""
+        # Split labels for word definition
+        text = split_spaces(data["definition"])
+        self.label, self.text = split_labels(text)
+
+        # Split example if word has example
+        example = data.get("example")
+        if example:
+            self.example = split_spaces(example)
+        else:
+            self.example = None
+
         self.synonyms = data.get("synonyms", []) # return an empty list if no synonyms can be retrieved from word
 
 
@@ -60,3 +86,8 @@ if __name__ == "__main__":
                 print("    Synonym(s):", ", ".join(definition.synonyms))
             else:
                 print("    Synonym(s): none")
+                
+    # Test split_labels and split_spaces
+    print(split_labels("(usually transitive) To have a strong affection."))
+    print(split_labels("Strong affection."))
+    print(split_spaces("I love my spouse.   I love you!"))
