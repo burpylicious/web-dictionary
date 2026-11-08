@@ -14,16 +14,16 @@ def test_split_spaces_ignores_normal_text():
 # Tests for splitting labels 
 def test_split_labels_splits_correctly():
     label, rest = split_labels("(usually transitive) To have a strong affection.")
-    assert label == "(usually transitive)"
-    assert rest == "To have a strong affection"
+    assert label == "usually transitive"
+    assert rest == "To have a strong affection."
 
 
 def test_split_labels_without_label():
-    assert split_labels("Strong affection.") == ("", "Strong Affection.")
+    assert split_labels("Strong affection.") == ("", "Strong affection.")
 
 
 def test_split_labels_with_missing_closing_bracket():
-    assert split_labels("(this text has no closing bracket") == ("", "this text has no closing bracket")
+    assert split_labels("(this text has no closing bracket") == ("", "(this text has no closing bracket")
 
 
 # Tests for valid words
