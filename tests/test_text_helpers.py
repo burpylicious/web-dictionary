@@ -8,7 +8,8 @@ def test_split_spaces_flattened():
 
 
 def test_split_spaces_ignores_normal_text():
-    assert split_spaces("Strong affection.") == "Strong affection!"
+    assert split_spaces("Strong affection.") == "Strong affection."
+
 
 # Tests for splitting labels 
 def test_split_labels_splits_correctly():
